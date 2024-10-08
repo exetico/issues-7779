@@ -1,0 +1,11 @@
+{
+  "projects": {
+    "default": "projectname-default",
+    "dev": "projectname-dev",
+    "test": "projectname-test",
+    "qa": "projectname-qa"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
+}
