@@ -2,7 +2,7 @@
 
 ## Versions
 
-firebase-tools: v13.20.2<br>
+firebase-tools: v13.22.0<br>
 platform: macOS
 
 ## Steps to reproduce
