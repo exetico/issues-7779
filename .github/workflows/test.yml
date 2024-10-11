@@ -21,5 +21,5 @@ jobs:
           npm install
       - name: Install `firebase-tools` module globally
         run: npm install -g firebase-tools@13.22.0
-      - name: Run `firebase emulators:exec 'npm run test' --debug`
-        run: firebase emulators:exec --only auth,functions,firestore,hosting,pubsub 'npm run test'
+      - name: Run `firebase emulators'
+        run: firebase emulators:exec 'npm run test' --debug
