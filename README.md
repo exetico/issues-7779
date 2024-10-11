@@ -5,6 +5,53 @@
 firebase-tools: v13.22.0<br>
 platform: macOS
 
+
+## Notes 11. oct 2024
+
+Running `firebase emulators:exec --only auth,functions,firestore,hosting,pubsub 'npm run test'` with the following package.json works:
+
+```json
+{
+  "name": "7624",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+  "test": "jest -- \"__tests__/\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^10.14.1",
+    "jest": "^29.7.0"
+  }
+}
+
+```
+
+Running `npm run test` with the following package does not work:
+
+```json
+{
+  "name": "7624",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "firebase emulators:exec 'npm run __jest' --debug",
+    "__jest": "jest -- \"__tests__/\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^10.14.1",
+    "jest": "^29.7.0"
+  }
+}
+```
+
 ## Steps to reproduce
 
 1. Install dependencies

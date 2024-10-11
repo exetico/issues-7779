@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "firebase emulators:exec 'npm run __jest' --debug",
-    "__jest": "jest -- \"__tests__/\""
+    "test_full_stack": "firebase emulators:exec 'npm run __jest' --debug",
+    "__jest": "jest -- \"__tests__/\"",
+    "test_jest_only": "jest -- \"__tests__/\""
   },
   "keywords": [],
   "author": "",
