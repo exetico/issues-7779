@@ -1,5 +1,10 @@
 # Repro for issue 7779
 
+## Test-run
+
+See test-run here:
+https://github.com/exetico/issues-7779/actions/runs/11291368550/job/31405143163
+
 ## Versions
 
 firebase-tools: v13.22.0<br>
