@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest -- \"__tests__/\""
+    "test": "cd emulators && firebase emulators:exec 'npm run __jest' --debug",
+    "__jest": "jest -- \"__tests__/\""
   },
   "keywords": [],
   "author": "",
