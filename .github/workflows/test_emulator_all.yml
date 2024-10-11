@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Perform `firebase emulators:exec "npm run test"`
+    name: Peform test with only (npm run test_emulator_all)
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,11 +22,12 @@ jobs:
       - name: Install `firebase-tools` module globally
         run: npm install -g firebase-tools@13.22.0
       - name: Run test
-        run: firebase emulators:exec --only auth,functions,firestore,hosting,pubsub 'npm run test_jest_only'
-      # If no test report are generated, handle this as a failure
-      - name: Check if test report exists
-        run: |
-          if [ ! -f "test-report.xml" ]; then
-            echo "No test report found"
-            exit 1
-          fi
+        run: npm run test_emulator_all
+
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()    # run this step even if previous step failed
+        with:
+          name: JEST Tests
+          path: reports/jest-*.xml
+          reporter: jest-junit

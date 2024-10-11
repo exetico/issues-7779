@@ -1,0 +1,33 @@
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Peform test with only (npm run test_emulator_only_exclude_extensions)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install npm modules
+        run: |
+          npm install
+      - name: Install function modules
+        run: |
+          cd functions
+          npm install
+      - name: Install `firebase-tools` module globally
+        run: npm install -g firebase-tools@13.22.0
+      - name: Run test
+        run: npm run test_emulator_only_exclude_extensions
+
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()    # run this step even if previous step failed
+        with:
+          name: JEST Tests
+          path: reports/jest-*.xml
+          reporter: jest-junit
