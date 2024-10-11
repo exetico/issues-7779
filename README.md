@@ -1,56 +1,57 @@
 # Repro for issue 7779
 
+## Tests
+
+Check the output of the two tests. Using `--only` to secure extensions are not started, the tests pass. Without `--only`, the tests fail.
+
+That's a problem on it's own.
+
+The next problem is that it's fails without a specific error about why. Adding `--debug` gives a indication about the problems related to the API calls, but... We're not expecting to see a isolated test to fail, just on basis of no API calls.
+
+```js
+➜  issues-7779 git:(main) ✗ npm run test_emulator_all                    
+
+> 7624@1.0.0 test_emulator_all
+> firebase emulators:exec 'npm run test_jest' --debug
+
+[2024-10-11T12:24:02.229Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+Failed to authenticate, have you run firebase login?
+⚠  emulators: You are not currently authenticated so some features may not work correctly. Please run firebase login to authenticate the CLI. 
+[2024-10-11T12:24:02.384Z] java version "19.0.2" 2023-01-17
+
+[2024-10-11T12:24:02.384Z] Java(TM) SE Runtime Environment (build 19.0.2+7-44)
+Java HotSpot(TM) 64-Bit Server VM (build 19.0.2+7-44, mixed mode, sharing)
+
+[2024-10-11T12:24:02.387Z] Parsed Java major version: 19
+i  emulators: Starting emulators: auth, functions, firestore, hosting, pubsub, extensions {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: auth, functions, firestore, hosting, pubsub, extensions"}}
+[2024-10-11T12:24:02.388Z] No OAuth tokens found
+[2024-10-11T12:24:02.388Z] No OAuth tokens found
+[2024-10-11T12:24:02.389Z] > refreshing access token with scopes: []
+[2024-10-11T12:24:02.390Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[2024-10-11T12:24:02.390Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[2024-10-11T12:24:02.470Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[2024-10-11T12:24:02.471Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[2024-10-11T12:24:02.471Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/projectname-default [none]
+[2024-10-11T12:24:02.530Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/projectname-default 401
+[2024-10-11T12:24:02.531Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/projectname-default {"error":{"code":401,"message":"Request is missing required authentication credential. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"CREDENTIALS_MISSING","domain":"googleapis.com","metadata":{"service":"firebase.googleapis.com","method":"google.firebase.service.v1beta1.FirebaseProjectService.GetFirebaseProject"}}]}}
+[2024-10-11T12:24:02.531Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[2024-10-11T12:24:02.531Z] No OAuth tokens found
+[2024-10-11T12:24:02.531Z] No OAuth tokens found
+[2024-10-11T12:24:02.531Z] > refreshing access token with scopes: []
+[2024-10-11T12:24:02.532Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[2024-10-11T12:24:02.532Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[2024-10-11T12:24:02.582Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[2024-10-11T12:24:02.582Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[2024-10-11T12:24:02.583Z] HTTP Error: 401, Request is missing required authentication credential. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[2024-10-11T12:24:02.585Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: connect ECONNREFUSED ::1:40001. If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+i  emulators: Shutting down emulators. {"metadata":{"emulator":{"name":"hub"},"message":"Shutting down emulators."}}
+[2024-10-11T12:24:02.586Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: connect ECONNREFUSED ::1:40001. If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+```
+
 ## Versions
 
 firebase-tools: v13.22.0<br>
 platform: macOS
-
-
-## Notes 11. oct 2024
-
-Running `firebase emulators:exec --only auth,functions,firestore,hosting,pubsub 'npm run test'` with the following package.json works:
-
-```json
-{
-  "name": "7624",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-  "test": "jest -- \"__tests__/\""
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "firebase": "^10.14.1",
-    "jest": "^29.7.0"
-  }
-}
-
-```
-
-Running `npm run test` with the following package does not work:
-
-```json
-{
-  "name": "7624",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "firebase emulators:exec 'npm run __jest' --debug",
-    "__jest": "jest -- \"__tests__/\""
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "firebase": "^10.14.1",
-    "jest": "^29.7.0"
-  }
-}
-```
 
 ## Steps to reproduce
 
@@ -90,57 +91,6 @@ i  emulators: Shutting down emulators. {"metadata":{"emulator":{"name":"hub"},"m
 
 ## Notes
 
-When using the firebase-tools `v13.20.2`, running `firebase emulators:exec --only auth,functions,firestore,hosting,pubsub 'npm run test'` outputs:
+I had 13.19.0 on system, where everything worked just fine.
 
-```
-i  emulators: Starting emulators: auth, functions, firestore, hosting, pubsub
-i  emulators: Shutting down emulators.
-```
-
-When using the firebase-tools `v13.21.0`, running `firebase emulators:exec --only auth,functions,firestore,hosting,pubsub 'npm run test'` outputs:
-
-```
-i  emulators: Starting emulators: auth, functions, firestore, hosting, pubsub
-⚠  functions: The following emulators are not running, calls to these services from the Functions emulator will affect production: database, storage, dataconnect
-⚠  functions: Unable to fetch project Admin SDK configuration, Admin SDK behavior in Cloud Functions emulator may be incorrect.
-i  firestore: Firestore Emulator logging to firestore-debug.log
-✔  firestore: Firestore Emulator UI websocket is running on 9150.
-i  pubsub: Pub/Sub Emulator logging to pubsub-debug.log
-⚠  hosting: Authentication error when trying to fetch your current web app configuration, have you run firebase login?
-⚠  hosting: Could not fetch web app configuration and there is no cached configuration on this machine. Check your internet connection and make sure you are authenticated. To continue, you must call firebase.initializeApp({...}) in your code before using Firebase.
-i  hosting[projectname-default]: Serving hosting files from: public
-✔  hosting[projectname-default]: Local server: http://127.0.0.1:5000
-i  functions: Watching "/Users/<PATH>/issues/7779/functions" for Cloud Functions...
-⚠  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory.
-⚠  functions: Please note that there will be breaking changes when you upgrade.
-⚠  functions: Your requested "node" version "18" doesn't match your global version "20". Using node@20 from host.
-Serving at port 8313
-
-✔  functions: Loaded functions definitions from source: .
-i  Running script: npm run test
-
-> 7624@1.0.0 test
-> jest -- "__tests__/"
-
-
- PASS  __tests__/index.test.js
-  ✓ should add 1 + 1 (1 ms)
-  ✓ should get a response from hosting emulator (25 ms)
-
-Test Suites: 1 passed, 1 total
-Tests:       2 passed, 2 total
-Snapshots:   0 total
-Time:        0.177 s, estimated 1 s
-Ran all test suites matching /__tests__\//i.
-✔  Script exited successfully (code 0)
-i  emulators: Shutting down emulators.
-i  functions: Stopping Functions Emulator
-i  hosting: Stopping Hosting Emulator
-i  firestore: Stopping Firestore Emulator
-i  pubsub: Stopping Pub/Sub Emulator
-i  auth: Stopping Authentication Emulator
-i  eventarc: Stopping Eventarc Emulator
-i  tasks: Stopping Cloud Tasks Emulator
-i  hub: Stopping emulator hub
-i  logging: Stopping Logging Emulator
-```
+It's broken on 13.22.0, if extensions are not excluded, by specifying the `--only` flag.
